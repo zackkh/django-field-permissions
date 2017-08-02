@@ -1,4 +1,4 @@
-from django import forms
+from django.contrib import admin
 
 
 class FieldPermissionAdminMixin:
@@ -19,5 +19,5 @@ class FieldPermissionAdminMixin:
         return fields
 
 
-class FieldPermissionAdmin(FieldPermissionAdminMixin, forms.ModelForm):
+class FieldPermissionAdmin(FieldPermissionAdminMixin, admin.ModelAdmin):
     pass
