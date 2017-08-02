@@ -49,6 +49,7 @@ class FieldPermissionModelMixin:
                 if result is not None:
                     return result
             else:
+                perm = '{}.{}'.format(self._meta.app_label, perm)  # Django perms format is app.permission_name
                 result = user.has_perm(perm)  # Don't supply 'obj', or else infinite recursion.
                 if result:
                     return True

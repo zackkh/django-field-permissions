@@ -11,7 +11,7 @@ class FieldPermissionAdminMixin:
 
         for name in fields:
             if name in fields and not obj.has_field_perm(request.user, field=name):
-                del fields[name]
+                fields.remove(name)
 
         return fields
 
