@@ -1,5 +1,6 @@
 from django import forms
 
+
 class FieldPermissionFormMixin:
     """
     ModelForm logic for removing fields when a user is found not to have change permissions.
