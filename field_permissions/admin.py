@@ -10,7 +10,8 @@ class FieldPermissionAdminMixin:
         fields = super().get_fields(request, obj)
 
         for name in fields:
-            if name in fields and not obj.has_field_perm(request.user, field=name):
+            instance = obj or self.model()
+            if name in fields and not instance.has_field_perm(request.user, field=name):
                 fields.remove(name)
 
         return fields
