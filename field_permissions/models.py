@@ -1,5 +1,6 @@
 from django.db import models
 
+
 class FieldPermissionModelMixin:
     field_permissions = {}  # {'field_name': callable}
     FIELD_PERM_CODENAME = 'can_{operation}_{model}_{name}'
@@ -27,7 +28,8 @@ class FieldPermissionModelMixin:
             checks = []
 
             # Consult the optional field-specific hook.
-            getter_name = self.FIELD_PERMISSION_GETTER.format(operation=operation, name=field)
+            getter_name = self.FIELD_PERMISSION_GETTER.format(
+                operation=operation, name=field)
             if hasattr(self, getter_name):
                 checks.append(getattr(self, getter_name))
 
@@ -59,6 +61,7 @@ class FieldPermissionModelMixin:
 
         # If no requirement can be met, then permission is denied.
         return False
+
 
 class FieldPermissionModel(FieldPermissionModelMixin, models.Model):
     class Meta:
