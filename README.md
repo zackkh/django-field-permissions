@@ -9,7 +9,7 @@ _Runtime per-object checks, auth.Permission (or arbitrary callable) for fields._
 
 We make you declare a ``has_perm(user, perm)`` on any model that requires object-level checks.  You can ignore this method if you don't care very much about object-level checks; the default one won't get in your way.
 
-Static per-field permissions are defined via Django's [custom permissions](https://docs.djangoproject.com/es/1.9/topics/auth/customizing/#custom-permissions) system, patterned as ``can_change_{model}_{fieldname}``, which is the standard permission label just with a suffix of the field in question.  Only fields nominated in this way will be checked by the system, and all others allow edits by default.
+Static per-field permissions are defined via Django's [custom permissions](https://docs.djangoproject.com/es/1.9/topics/auth/customizing/#custom-permissions) system, patterned as ``can_{operation}_{model}_{fieldname}``, which is the standard permission label just with a suffix of the field in question. By default `view` and `change` are checked to determine if a User can view and/or modify the field. If `view` permission is given but not `change` permission, in certain environments the field will be set as `read_only`. By default all permissions are assumed as `True`.
 
 You then assign these permissions the usual way (to ``auth.Group`` instances or specific users).  If ``user.has_perm('can_change_mymodel_myfield')`` returns True, then by default ``instance.has_field_perm(user, 'myfield')`` will return True as well.
 
@@ -22,7 +22,7 @@ Finally, if you really freaky, you can declare instead a class-level dictionary 
 Grab a copy of the code from the repository:
 
 ```shell
-pip install git+https://github.com/tiliv/django-field-permissions#egg=field_permissions
+pip install git+https://github.com/Sleepy105/django-field-permissions#egg=field_permissions
 ```
 
 Add it to your ``settings.INSTALLED_APPS`` and tell Django about our object-level permission auth backend:
@@ -72,7 +72,9 @@ class Post(FieldPermissionModelMixin, models.Model):
 
     class Meta:
         permissions = (
+            ('can_view_post_name', "Can view post name"),
             ('can_change_post_name', "Can change post name"),
+            ('can_view_post_content', "Can view post content"),
             ('can_change_post_content', "Can change post content"),
         )
 ```
@@ -106,9 +108,13 @@ class Post(FieldPermissionModelMixin, models.Model):
 
     class Meta:
         permissions = (
+            ('can_view_post_name', "Can view post name"),
             ('can_change_post_name', "Can change post name"),
             ('can_change_post_content', "Can change post content"),
         )
+
+    def can_view_name(self, user):
+        return True
 
     def can_change_name(self, user):
         return self.user == user or user.is_staff
@@ -150,7 +156,10 @@ def is_owner_or_staff(obj, user, field):
 class Post(FieldPermissionModelMixin, models.Model):
     field_permissions = {
         'name': is_owner_or_staff,
-        'content': is_owner_or_staff,
+        'content': {
+            'view': is_owner_or_staff,
+            'change': is_owner_or_staff,
+        },
     }
 
     # ...
@@ -164,7 +173,10 @@ Finally, you could supply an arbitrary perm label in the dictionary, although th
 class Post(FieldPermissionModelMixin, models.Model):
     field_permissions = {
         'name': 'myapp.can_do_thing_one',
-        'content': 'myapp.can_do_thing_two',
+        'content': {
+            'view': 'myapp.can_do_thing_two',
+            'change': 'myapp.can_do_thing_three',
+        },
     }
 
     # ...
@@ -213,10 +225,10 @@ The following is how the mixin controls which permission codenames it wants to d
 ```python
 class FieldPermissionModelMixin:
     # Custom permission codename expected in Meta.permissions
-    FIELD_PERM_CODENAME = 'can_change_{model}_{name}'
+    FIELD_PERM_CODENAME = 'can_{operation}_{model}_{name}'
 
     # Per-field hook name for runtime checks
-    FIELD_PERMISSION_GETTER = 'can_change_{name}'
+    FIELD_PERMISSION_GETTER = 'can_{operation}_{name}'
 
     # The permission granted to any user when asking about a field
     # not found in the model's Meta.permissions or field_permissions dict.
