@@ -28,7 +28,7 @@ class FieldPermissionSerializerMixin:
         for name in model_field_names:
             if name in self.fields:
                 if not obj.has_field_perm(user, field=name, operation='view'):
-                    self.fields.remove(name)
+                    self.fields.pop(name)
                 elif not obj.has_field_perm(user, field=name, operation='change'):
                     self.fields[name].read_only = True
 
