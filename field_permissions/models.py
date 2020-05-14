@@ -1,4 +1,5 @@
 from django.db import models
+from functools import partial
 
 
 class FieldPermissionModelMixin:
