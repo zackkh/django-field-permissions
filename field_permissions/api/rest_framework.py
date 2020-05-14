@@ -14,7 +14,8 @@ class FieldPermissionSerializerMixin:
     def __init__(self, *args, **kwargs):
         super(FieldPermissionSerializerMixin, self).__init__(*args, **kwargs)
 
-        user = self.context['request'].user
+        request = self.context.get('request')
+        user = request.user if hasattr(request, 'user') else None
         model = self.Meta.model
         model_field_names = [f.name for f in model._meta.get_fields()]  # this might be too broad
 
