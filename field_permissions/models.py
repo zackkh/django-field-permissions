@@ -23,7 +23,10 @@ class FieldPermissionModelMixin:
                 checks = [checks]
             for i, perm in enumerate(checks):
                 if callable(perm):
-                    checks[i] = partial(perm, operation=operation, field=field)
+                    # Disabled, breaks rules
+                    # TODO: Better solution
+                    # checks[i] = partial(perm, operation=operation, field=field)
+                    checks[i] = partial(perm)
 
         else:
             checks = []
