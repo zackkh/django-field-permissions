@@ -3,6 +3,7 @@ API helpers for django-rest-framework.
 """
 
 from rest_framework import serializers
+from django.db.models.query import QuerySet
 
 
 class FieldPermissionSerializerMixin:
@@ -19,12 +20,15 @@ class FieldPermissionSerializerMixin:
         model = self.Meta.model
         model_field_names = [f.name for f in model._meta.get_fields()]  # this might be too broad
 
-        # Added checks for methods without instance (create)
-        # and with multiple instances (list)
-        if self.instance is None or len(self.instance) is not 1:
+        # Methods without instance eg. create
+        if self.instance is None:
             obj = model()
+        # Methods with multiple instances, eg. list
+        elif isinstance(self.instance, QuerySet):
+            obj = model()
+        # Methods with one instance, eg. retrieve
         else:
-            obj = self.instance[0]
+            obj = self.instance
 
         for name in model_field_names:
             if name in self.fields:
