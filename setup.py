@@ -1,6 +1,6 @@
 from setuptools import setup, find_packages
 
-setup(name='django-field-permissions',
+setup(name='field-permissions',
       version='0.1',
       description='A starting place for field-level permissions',
       author='Tim Valenta',
