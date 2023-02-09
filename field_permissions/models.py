@@ -54,7 +54,8 @@ class FieldPermissionModelMixin:
         # Try to find a user setting that qualifies them for permission.
         for perm in checks:
             if callable(perm):
-                result = perm(user, self)
+                # perm(user, self) does not make sense, switch to perm(self, user)
+                result = perm(self, user)
                 if result is not None:
                     return result
             else:
