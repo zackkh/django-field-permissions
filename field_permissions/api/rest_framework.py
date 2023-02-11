@@ -24,7 +24,7 @@ class FieldPermissionSerializerMixin:
         if self.instance is None:
             obj = model()
         # Methods with multiple instances, eg. list
-        elif isinstance(self.instance, QuerySet):
+        elif isinstance(self.instance, (QuerySet, list)):
             obj = model()
         # Methods with one instance, eg. retrieve
         else:
